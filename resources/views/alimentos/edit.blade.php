@@ -23,9 +23,9 @@
                             <label for="categoria" class="form-label">Categoria</label>
                             <select class="form-select @error('categoria') is-invalid @enderror" id="categoria" name="categoria" required>
                                 <option value="">Selecione uma categoria</option>
-                                @foreach($categorias as $key => $value)
-                                    <option value="{{ $key }}" {{ old('categoria', $alimento->categoria) == $key ? 'selected' : '' }}>
-                                        {{ $value }}
+                                @foreach($categorias as $valor => $nome)
+                                    <option value="{{ $valor }}" {{ old('categoria', $alimento->categoria) == $valor ? 'selected' : '' }}>
+                                        {{ $nome }}
                                     </option>
                                 @endforeach
                             </select>

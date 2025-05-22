@@ -10,10 +10,10 @@ return new class extends Migration {
         Schema::create('alimentos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->string('categoria');
             $table->integer('quantidade');
-            $table->integer('estoque_minimo')->default(5);
             $table->date('validade')->nullable();
+            $table->string('categoria');
+            $table->integer('estoque_minimo')->default(5);
             $table->timestamps();
         });
     }

@@ -7,35 +7,20 @@ use App\Models\Alimento;
 
 class AlimentoController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Alimento::query();
-
-        // Filtro por categoria
-        if ($request->has('categoria')) {
-            $query->where('categoria', $request->categoria);
-        }
-
-        // Filtro por validade próxima
-        if ($request->has('validade_proxima')) {
-            $query->where('validade', '<=', now()->addDays(7))
-                  ->where('validade', '>=', now());
-        }
-
-        // Filtro por estoque baixo
-        if ($request->has('estoque_baixo')) {
-            $query->whereRaw('quantidade <= estoque_minimo');
-        }
-
-        $alimentos = $query->get();
+        $alimentos = Alimento::all();
+        $alimentosEstoqueBaixo = Alimento::comEstoqueBaixo();
+        $alimentosValidadeProxima = Alimento::comValidadeProxima();
         $categorias = Alimento::CATEGORIAS;
-
-        return view('alimentos.index', compact('alimentos', 'categorias'));
+        
+        return view('alimentos.index', compact('alimentos', 'alimentosEstoqueBaixo', 'alimentosValidadeProxima', 'categorias'));
     }
 
     public function create()
     {
         $categorias = Alimento::CATEGORIAS;
+        
         return view('alimentos.create', compact('categorias'));
     }
 
@@ -43,20 +28,22 @@ class AlimentoController extends Controller
     {
         $request->validate([
             'nome' => 'required',
-            'categoria' => 'required|in:' . implode(',', array_keys(Alimento::CATEGORIAS)),
             'quantidade' => 'required|integer|min:0',
-            'estoque_minimo' => 'required|integer|min:0',
             'validade' => 'nullable|date',
+            'categoria' => 'required|in:' . implode(',', array_keys(Alimento::CATEGORIAS)),
+            'estoque_minimo' => 'required|integer|min:0'
         ]);
 
         Alimento::create($request->all());
 
-        return redirect()->route('alimentos.index')->with('sucesso', 'Alimento adicionado!');
+        return redirect()->route('alimentos.index')
+            ->with('sucesso', 'Alimento adicionado com sucesso!');
     }
 
     public function edit(Alimento $alimento)
     {
         $categorias = Alimento::CATEGORIAS;
+        
         return view('alimentos.edit', compact('alimento', 'categorias'));
     }
 
@@ -64,21 +51,23 @@ class AlimentoController extends Controller
     {
         $request->validate([
             'nome' => 'required',
-            'categoria' => 'required|in:' . implode(',', array_keys(Alimento::CATEGORIAS)),
             'quantidade' => 'required|integer|min:0',
-            'estoque_minimo' => 'required|integer|min:0',
             'validade' => 'nullable|date',
+            'categoria' => 'required|in:' . implode(',', array_keys(Alimento::CATEGORIAS)),
+            'estoque_minimo' => 'required|integer|min:0'
         ]);
 
         $alimento->update($request->all());
 
-        return redirect()->route('alimentos.index')->with('sucesso', 'Alimento atualizado!');
+        return redirect()->route('alimentos.index')
+            ->with('sucesso', 'Alimento atualizado com sucesso!');
     }
 
     public function destroy(Alimento $alimento)
     {
         $alimento->delete();
 
-        return redirect()->route('alimentos.index')->with('sucesso', 'Alimento removido!');
+        return redirect()->route('alimentos.index')
+            ->with('sucesso', 'Alimento removido com sucesso!');
     }
 }
